@@ -1,0 +1,3 @@
+.pio
+config/*.yaml
+!config/default.yaml
