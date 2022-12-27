@@ -53,6 +53,7 @@ if ( checksum >= 256 ){
 * 2x Resistor 150R
 * 1x Resistor 330R
 * 3x Optocoupler PC817 or EL817
+* 1x Step Down Module (20V input, 5v output)
 
 #### Circuit
 
@@ -63,7 +64,8 @@ if ( checksum >= 256 ){
 ![connector](doc/connector.png)
 
 
-### Links that helped me
+
+## Links that helped me
 
 - https://k3a.me/ir-controller-for-pellet-stove-with-micronova-controller-stufe-e-pellet-aria-ir-telecomando/
 - https://ridiculouslab.altervista.org/en/micronova-protocol-converter/
