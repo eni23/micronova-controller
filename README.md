@@ -84,6 +84,14 @@ Those are only tested for my stove (*L'Asolana Marina*), it seems like there are
 | EEPROM | 0x7d | set temperature as 1:1 value | 
 | EEPROM | 0x7f | power, 1-4 | 
 | EEPROM | 0x25 | night mode, 0=off, 1=on |
+| EEPROM | 0x51 | daily timer 01, turn on time (x10 minutes since midnight)
+| EEPROM | 0x52 | daily timer 01, turn off time (x10 minutes since midnight)
+| EEPROM | 0x53 | daily timer 01, power
+| EEPROM | 0x54 | daily timer 01, shut off temperature
+| EEPROM | 0x56 | daily timer 02, turn on time (x10 minutes since midnight)
+| EEPROM | 0x57 | daily timer 02, turn off time (x10 minutes since midnight)
+| EEPROM | 0x58 | daily timer 02, power
+| EEPROM | 0x50 | daily timer 02, shut off temperature
 
 
 State (`0x21`) has the following values for my stove:

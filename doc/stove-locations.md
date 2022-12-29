@@ -14,8 +14,6 @@
 | RAM | 0x37 | fumes fan |
 | RAM | 0x0D | pellet loading in use?  | 
 | RAM | 0x7D | temp, increasing, intake?, gets cold quicker than 0x02 | 
-
-
 | RAM | 0x7b | Day of week (to be confirmed) |
 | RAM | 0x7c | Minute |
 | RAM | 0x7d | Hour |
@@ -38,6 +36,13 @@ power set: write both to EEPROM:0x7f and RAM:0x19
 
 
 0x0c & 0x0a: evtl: outgoing fan
+
+
+timer: 
+38=6:30
+44=7:40
+118=19:40
+122=20:30
 
 
 ## Locations 
