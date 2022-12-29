@@ -61,7 +61,7 @@ if ( checksum >= 256 ){
 
 #### Known locations
 
-Those are only tested for my stove (*L'Asolana Marina*), it seems like there are different values on different stoves.
+Those are only tested for my stove (*L'Asolana Marina*), it seems like there are different values on different stoves. My Stove has a `L023_7` control board.
 
 
 | Type | Address | Description |
