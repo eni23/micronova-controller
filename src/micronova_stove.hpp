@@ -1,7 +1,17 @@
 #include <Arduino.h>
 
 
-#define SERIAL_MODE SERIAL_8N2
+#if defined(ESP8266) || defined(USE_SWSERIAL)
+  #include <SoftwareSerial.h>
+  SoftwareSerial StoveSerial;
+  #define SERIAL_MODE SWSERIAL_8N2 
+#endif
+
+#if defined(ESP32) || defined(USE_HWSERIAL)
+  #include <HardwareSerial.h>
+  HardwareSerial StoveSerial(1);
+  #define SERIAL_MODE SERIAL_8N2 
+#endif
 
 
 #define STOVE_OFFSET_RAM_READ     0x00
@@ -53,7 +63,7 @@ class MicronovaStove {
 
 
     void init(){
-      Serial2.begin( 1200, SERIAL_MODE, pin_rx, pin_tx );
+      StoveSerial.begin( 1200, SERIAL_MODE, pin_rx, pin_tx );
       printf("begin stove serial");
       pinMode( pin_rx_enable, OUTPUT );
       digitalWrite( pin_rx_enable, HIGH ); 
@@ -73,6 +83,13 @@ class MicronovaStove {
       digitalWrite( pin_rx_enable, HIGH );
     }
 
+    void flushInput(){
+      while (Serial.available()){
+        Serial.read();
+        printf("flush: read 1 extra byte\n");
+      }
+    }
+
 
     void read(uint8_t location, uint8_t addr){
 
@@ -85,27 +102,32 @@ class MicronovaStove {
 
       }
 
-      Serial2.write(location);
+      StoveSerial.write(location);
       delay(1);
-      Serial2.write(addr);
-      
+      StoveSerial.write(addr);
+      // flush in arduino only waits until the output buffer is written
+      StoveSerial.flush();
+
+
       if (dbg_out) printf("read stove answer\n");
 
       //return;
+      delay(20);
       enable_rx();
-      delay(80);
       
       uint8_t rx_count = 0;
       stove_rx_data[0] = 0x00;
       stove_rx_data[1] = 0x00;
       // we have to flush it first to make sure no crap data is on the bus
-      Serial2.flush();
-      while ( Serial2.available() ) {
+      StoveSerial.flush();
+      while ( StoveSerial.available() ) {
         if (rx_count>1){
-          Serial2.flush();
+          while ( StoveSerial.available() ) {
+            printf("read 1 extra byte\n");
+          }
           break;
         }
-        stove_rx_data[rx_count] = Serial2.read();
+        stove_rx_data[rx_count] = StoveSerial.read();
         rx_count++;
       }
       last_read_value = stove_rx_data[1];
@@ -139,11 +161,14 @@ class MicronovaStove {
       printf("write data=");
       for ( int i = 0; i < 4; i++ ){
         printf("0x%02x ", data_to_write[i] );
-        Serial2.write( data_to_write[i] );
+        StoveSerial.write( data_to_write[i] );
         delay(1);
       }
 
       printf("\n");
+      // TODO: Read/verify answer
+      flushInput();
+
     }
 
     void write_ram( uint8_t command, uint8_t data ){

@@ -7,7 +7,7 @@ Console console;
 
 
 
-#include "micronova_stove.cpp"
+#include "micronova_stove.hpp"
 
 
 #define STOVE_PIN_RX        27
