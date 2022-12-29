@@ -1,3 +1,33 @@
+## my stove confirmed locations 
+
+| Type | Loc. | DESCRIPTION |
+|------|------|-------------|
+| RAM | 0x00 | internal timer of the program (ranging from 0-255 continuously) | 
+| RAM | 0x01 | temperature multiplied by 2 | 
+| RAM | 0x21 | power state (0-stove off, 1-stove start) | 
+| RAM | 0x19 | power setting (0-4, only read works) | 
+| EEPROM | 0x7d | set temperature as 1:1 value | 
+| EEPROM | 0x7f | power, 1-4 | 
+| EEPROM | 0x25 | night mode, 0=off, 1=on |
+| RAM | 0x3E | Fumes temperature | 
+| RAM | 0x02 | temp something, increasing |
+| RAM | 0x37 | some in/dec fan->fumes fan? |
+| RAM | 0x0D | pellet loading in use?  | 
+| RAM | 0x7D | temp, increasing, intake? | 
+
+power set: write both to EEPROM:0x7f and RAM:0x19
+
+
+0x21:
+0=off
+1=control
+2=phase1
+3=phase2
+4=running
+6=turning off
+
+
+
 ## Locations 
 (according to 3ka)
 

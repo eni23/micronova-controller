@@ -63,7 +63,7 @@ class MicronovaStove {
 
 
     void init(){
-      StoveSerial.begin( 1200, SERIAL_MODE, pin_rx, pin_tx );
+      StoveSerial.begin( 1200, SERIAL_MODE, pin_rx, pin_tx, false, 256 );
       printf("begin stove serial");
       pinMode( pin_rx_enable, OUTPUT );
       digitalWrite( pin_rx_enable, HIGH ); 
@@ -84,6 +84,7 @@ class MicronovaStove {
     }
 
     void flushInput(){
+      printf("flush serial input\n");
       while (Serial.available()){
         Serial.read();
         printf("flush: read 1 extra byte\n");
@@ -92,6 +93,8 @@ class MicronovaStove {
 
 
     void read(uint8_t location, uint8_t addr){
+      
+      dbg_out=false;
 
       if (dbg_out){
         printf("read request loc=");
@@ -102,39 +105,47 @@ class MicronovaStove {
 
       }
 
+      
       StoveSerial.write(location);
-      delay(1);
+      StoveSerial.flush();
       StoveSerial.write(addr);
-      // flush in arduino only waits until the output buffer is written
       StoveSerial.flush();
 
+      enable_rx();
+      // the stove needs some time to answer
+      delay(120);
 
       if (dbg_out) printf("read stove answer\n");
 
-      //return;
-      delay(20);
-      enable_rx();
-      
       uint8_t rx_count = 0;
       stove_rx_data[0] = 0x00;
       stove_rx_data[1] = 0x00;
-      // we have to flush it first to make sure no crap data is on the bus
-      StoveSerial.flush();
+      
       while ( StoveSerial.available() ) {
         if (rx_count>1){
-          while ( StoveSerial.available() ) {
-            printf("read 1 extra byte\n");
-          }
-          break;
+          rx_count = 0;
+          //printf("over 2 extra byte\n");
+          // while ( StoveSerial.available() ) {
+          //   StoveSerial.read();
+          //   printf("read 1 extra byte\n");
+          // }
+          // break;
         }
         stove_rx_data[rx_count] = StoveSerial.read();
+        if (dbg_out) printf("i=0x%02x data=0x%02x\n",rx_count,stove_rx_data[rx_count]);
         rx_count++;
       }
+
+      
+      disable_rx();
       last_read_value = stove_rx_data[1];
       last_read_checksum = stove_rx_data[0];
       last_read_param = last_read_checksum - last_read_value;
+
+      if (last_read_param != addr ){
+        if (dbg_out) printf("E: return mismatch\n");
+      }
       // TODO: check for error with checksum
-      disable_rx();
     }
 
     uint8_t read_ram( uint8_t addr ){

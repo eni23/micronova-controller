@@ -55,8 +55,13 @@ void setup() {
         auto arg = String(argv[1]);
         
         stove.read_ram(convert_str_to_hex(arg));
-        printf(" returned data=0x%02x,0x%02x ret=0x%02x \n", stove.stove_rx_data[0], stove.stove_rx_data[1], stove.last_read_param );
-
+        printf(" returned chk=0x%02x data=0x%02x param=0x%02x dec=%d ascii=%c\n", 
+            stove.stove_rx_data[0], 
+            stove.stove_rx_data[1], 
+            stove.last_read_param,
+            stove.last_read_value,
+            stove.last_read_value
+        );
 
         return EXIT_SUCCESS;
     }, "Read RAM"));
@@ -69,7 +74,13 @@ void setup() {
         }
         auto arg = String(argv[1]);
         stove.read_eeprom(convert_str_to_hex(arg));
-        printf(" returned data=0x%02x,0x%02x ret=0x%02x \n", stove.stove_rx_data[0], stove.stove_rx_data[1], stove.last_read_param );
+        printf(" returned chk=0x%02x data=0x%02x param=0x%02x dec=%d ascii=%c\n", 
+            stove.stove_rx_data[0], 
+            stove.stove_rx_data[1], 
+            stove.last_read_param,
+            stove.last_read_value,
+            stove.last_read_value
+        );        
         return EXIT_SUCCESS;
     }, "Read EEPROM"));
 
@@ -85,6 +96,18 @@ void setup() {
         stove.write_ram(convert_str_to_hex(addr), convert_str_to_hex(data) );
         return EXIT_SUCCESS;
     }, "Write to RAM"));
+    
+    // write-eeprom
+    console.registerCommand(ConsoleCommandD("write-eeprom", [](int argc, char **argv) -> int {
+        if (argc != 3){
+            printf("invalid number of arguments\n");
+            return EXIT_FAILURE;
+        }
+        auto addr = String(argv[1]);
+        auto data = String(argv[2]);
+        stove.write_eeprom(convert_str_to_hex(addr), convert_str_to_hex(data) );
+        return EXIT_SUCCESS;
+    }, "Write to EEPROM"));
 
     // console.registerCommand(ConsoleCommandD("kill-loop", [](int argc, char **argv) -> int {
     //     for (;;) {
@@ -98,8 +121,8 @@ void setup() {
         uint8_t resp;
         stove.dbg_out=false;
         for (int i=0; i<255; i++ ) {
-            resp=stove.read_ram(i);
-            printf("0x%02x|0x%02x\n",i,resp);
+            stove.read_ram(i);
+            printf("0x%02x|0x%02x|%d|%c\n",i,stove.last_read_value,stove.last_read_value,stove.last_read_value);
             delay(1);
         }
         stove.dbg_out=true;
@@ -110,8 +133,8 @@ void setup() {
         uint8_t resp;
         stove.dbg_out=false;
         for (int i=0; i<255; i++ ) {
-            resp=stove.read_eeprom(i);
-            printf("0x%02x|0x%02x\n",i,resp);
+            stove.read_eeprom(i);
+            printf("0x%02x|0x%02x|%d|%c\n",i,stove.last_read_value,stove.last_read_value,stove.last_read_value);
             delay(1);
         }
         stove.dbg_out=true;
