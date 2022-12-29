@@ -75,6 +75,12 @@ Those are only tested for my stove (*L'Asolana Marina*), it seems like there are
 | RAM | 0x37 | fumes fan speed |
 | RAM | 0x0D | pellet loading formula in use  | 
 | RAM | 0x7D | temp, increasing, intake?, gets cold quicker than 0x02 | 
+| RAM | 0x7b | Day of week (to be confirmed) |
+| RAM | 0x7c | Minute |
+| RAM | 0x7d | Hour |
+| RAM | 0x7e | Day of Month |
+| RAM | 0x7f | Month |
+| RAM | 0x80 | Year since 2000 |
 | EEPROM | 0x7d | set temperature as 1:1 value | 
 | EEPROM | 0x7f | power, 1-4 | 
 | EEPROM | 0x25 | night mode, 0=off, 1=on |

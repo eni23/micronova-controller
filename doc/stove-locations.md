@@ -15,6 +15,14 @@
 | RAM | 0x0D | pellet loading in use?  | 
 | RAM | 0x7D | temp, increasing, intake?, gets cold quicker than 0x02 | 
 
+
+| RAM | 0x7b | Day of week (to be confirmed) |
+| RAM | 0x7c | Minute |
+| RAM | 0x7d | Hour |
+| RAM | 0x7e | Day of Month |
+| RAM | 0x7f | Month |
+| RAM | 0x80 | Year since 2000 |
+
 power set: write both to EEPROM:0x7f and RAM:0x19
 
 
@@ -26,6 +34,10 @@ power set: write both to EEPROM:0x7f and RAM:0x19
 4=running
 6=turning off 
 7=cooling
+
+
+
+0x0c & 0x0a: evtl: outgoing fan
 
 
 ## Locations 
