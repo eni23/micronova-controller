@@ -70,28 +70,30 @@ Those are only tested for my stove (*L'Asolana Marina*), it seems like there are
 | RAM | 0x01 | ambient temperature multiplied by 2 | 
 | RAM | 0x21 | power state (0-stove off, 1-stove start) | 
 | RAM | 0x19 | power setting (0-4, only read works) | 
+| RAM | 0x0a | hot air outgoing fan power, seems to be between 0-~50 | 
 | RAM | 0x3E | Fumes temperature | 
 | RAM | 0x02 | temp something, increasing |
 | RAM | 0x37 | fumes fan speed |
 | RAM | 0x0D | pellet loading formula in use  | 
-| RAM | 0x7D | temp, increasing, intake?, gets cold quicker than 0x02 | 
-| RAM | 0x7b | Day of week (to be confirmed) |
-| RAM | 0x7c | Minute |
-| RAM | 0x7d | Hour |
-| RAM | 0x7e | Day of Month |
-| RAM | 0x7f | Month |
+| RAM | 0x7B | Secounds |
+| RAM | 0x7B | Day of week (to be confirmed) |
+| RAM | 0x7C | Hour |
+| RAM | 0x7D | Minute |
+| RAM | 0x7E | Day of Month |
+| RAM | 0x7F | Month |
 | RAM | 0x80 | Year since 2000 |
 | EEPROM | 0x7d | set temperature as 1:1 value | 
 | EEPROM | 0x7f | power, 1-4 | 
 | EEPROM | 0x25 | night mode, 0=off, 1=on |
-| EEPROM | 0x51 | daily timer 01, turn on time (x10 minutes since midnight)
-| EEPROM | 0x52 | daily timer 01, turn off time (x10 minutes since midnight)
-| EEPROM | 0x53 | daily timer 01, power
-| EEPROM | 0x54 | daily timer 01, shut off temperature
-| EEPROM | 0x56 | daily timer 02, turn on time (x10 minutes since midnight)
-| EEPROM | 0x57 | daily timer 02, turn off time (x10 minutes since midnight)
-| EEPROM | 0x58 | daily timer 02, power
-| EEPROM | 0x50 | daily timer 02, shut off temperature
+| EEPROM | 0x50 | daily timer enable 0x00=off, 0x01=on |
+| EEPROM | 0x51 | daily timer 01, turn on time (x10 minutes since midnight) |
+| EEPROM | 0x52 | daily timer 01, turn off time (x10 minutes since midnight) |
+| EEPROM | 0x53 | daily timer 01, power, 1-4 |
+| EEPROM | 0x54 | daily timer 01, set temperature |
+| EEPROM | 0x56 | daily timer 02, turn on time (x10 minutes since midnight) |
+| EEPROM | 0x57 | daily timer 02, turn off time (x10 minutes since midnight) |
+| EEPROM | 0x58 | daily timer 02, power, 1-4 |
+| EEPROM | 0x50 | daily timer 02, set temperature |
 
 
 State (`0x21`) has the following values for my stove:
