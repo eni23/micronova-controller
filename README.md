@@ -1,7 +1,10 @@
 # Micronova Controller
 
-## Stove
+This repo contains documentation and code to interface with a pellet stove based on Micronova controllers.
+I only tested it with my own stove (*L'Asolana Marina*), but it should work with all Micronova based stoves. Please note that the `RAM` and `EEPROM` mappings will probably be different for other models.
 
+
+## Stove
 
 ### Protocol
 
@@ -58,6 +61,12 @@ if ( checksum >= 256 ){
   checksum = checksum - 256;
 }
 ```
+
+The stove answers with 2 bytes:
+```
+[CHEKSUM] [DATA]
+```
+
 
 #### Known locations
 
@@ -165,6 +174,12 @@ void loop(){
 ```
 
 ### Interface Circuit
+
+The circuit uses optocouplers to do the level-shifting (stove is 5V logic and ESP32 3.3V).
+The opocouplers also implementing a echo cancellation.
+For reading values from the stove, one has to pull the `ENABLE_RX` optocoupler to low, but then no data at `TX` will be sent to the stove anymore.
+
+The circuit is based on the one from [philibertc/micronova_controller](https://github.com/philibertc/micronova_controller)
 
 #### BOM
 
