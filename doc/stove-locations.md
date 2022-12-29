@@ -11,9 +11,9 @@
 | EEPROM | 0x25 | night mode, 0=off, 1=on |
 | RAM | 0x3E | Fumes temperature | 
 | RAM | 0x02 | temp something, increasing |
-| RAM | 0x37 | some in/dec fan->fumes fan? |
+| RAM | 0x37 | fumes fan |
 | RAM | 0x0D | pellet loading in use?  | 
-| RAM | 0x7D | temp, increasing, intake? | 
+| RAM | 0x7D | temp, increasing, intake?, gets cold quicker than 0x02 | 
 
 power set: write both to EEPROM:0x7f and RAM:0x19
 
@@ -24,8 +24,8 @@ power set: write both to EEPROM:0x7f and RAM:0x19
 2=phase1
 3=phase2
 4=running
-6=turning off
-
+6=turning off 
+7=cooling
 
 
 ## Locations 
