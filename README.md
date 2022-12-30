@@ -78,14 +78,14 @@ Those are only tested for my stove (*L'Asolana Marina*), it seems like there are
 | RAM | 0x00 | internal timer of the program (ranging from 0-255 continuously) | 
 | RAM | 0x01 | ambient temperature multiplied by 2 | 
 | RAM | 0x21 | power state (0-stove off, 1-stove start) | 
-| RAM | 0x19 | power setting (0-4, only read works) | 
+| RAM | 0x34 | power setting (0-4, only read works) | 
 | RAM | 0x0a | hot air outgoing fan power, seems to be between 0-~50 | 
 | RAM | 0x3E | Fumes temperature | 
-| RAM | 0x02 | temp something, increasing |
+| RAM | 0x02 | temp, could be air outlet |
 | RAM | 0x37 | fumes fan speed |
 | RAM | 0x0D | pellet loading formula in use  | 
 | RAM | 0x7B | Secounds |
-| RAM | 0x7B | Day of week (to be confirmed) |
+| RAM | 0x7B | Day of week |
 | RAM | 0x7C | Hour |
 | RAM | 0x7D | Minute |
 | RAM | 0x7E | Day of Month |
@@ -102,7 +102,7 @@ Those are only tested for my stove (*L'Asolana Marina*), it seems like there are
 | EEPROM | 0x56 | daily timer 02, turn on time (x10 minutes since midnight) |
 | EEPROM | 0x57 | daily timer 02, turn off time (x10 minutes since midnight) |
 | EEPROM | 0x58 | daily timer 02, power, 1-4 |
-| EEPROM | 0x50 | daily timer 02, set temperature |
+| EEPROM | 0x59 | daily timer 02, set temperature |
 
 
 State (`0x21`) has the following values for my stove:
@@ -121,7 +121,7 @@ State (`0x21`) has the following values for my stove:
 Room temperature can be read in `0x01`, then divide the value by 2. The display of the stove cannot display decimal places but it seems that the sensor has an accuracy of 0.5°C. 
 
 The power (P1-P4) can be changed when writing to `EEPROM 0x7f` value `0x01 (P1) to 0x04 (P4)`, then the stove immediatley changes.
-Manually changing over the display seems to change it also in `RAM 0x19`, so i would recommend to write it there as well.
+Manually changing over the display seems to change it also in `RAM 0x34`, so i would recommend to write it there as well.
 
 
 The fan speed can be calculated as follows:
@@ -130,6 +130,7 @@ Take the maximum value of the spins and divide it by 255, the result is offset.
 Rpm=(value*10)+offset
 ```
 
+The clock in RAM can only be read. I did not figure out yet how to change the time, there must be a flag in RAM as well.
 
 
 Please see [doc/stove-locations.md](./doc/stove-locations.md) for more possible locations.
