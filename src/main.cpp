@@ -172,6 +172,11 @@ void setup() {
         return EXIT_SUCCESS;
     }, "."));
 
+    console.registerCommand(ConsoleCommandD("turnoff", [](int argc, char **argv) -> int {
+        stove.simulate_infrared(STOVE_IR_POWER, 8);
+        return EXIT_SUCCESS;
+    }, "."));
+
 }
 
 void loop() {

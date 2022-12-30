@@ -23,12 +23,21 @@
 #define STOVE_ADDR_STATE          0x21
 #define STOVE_ADDR_FUMES_TEMP     0x3E
 #define STOVE_ADDR_FLAMES_POWER   0x34
+#define STOVE_ADDR_IRCOMMAND      0x58
+
 
 // STATE
 #define STOVE_STATE_TURN_ON       0x01
 #define STOVE_STATE_TURN_OFF      0x06
 #define STOVE_STATE_FORCE_OFF     0x00
 
+
+// IRCOMMANDS
+#define STOVE_IR_POWERUP          0x54
+#define STOVE_IR_POWERDOWN        0x50
+#define STOVE_IR_TEMPUP           0x52
+#define STOVE_IR_TEMPDOWN         0x58
+#define STOVE_IR_POWER            0x5A
 
 //0 - OFF, 1 - Starting, 2 - Pellet loading, 3 - Ignition, 4 - Work, 5 - Brazier cleaning, 6 - Final cleaning, 7 - Standby, 8 - Pellet missing alarm, 9 - Ignition failure alarm, 10 - Alarms (to be investigated)
 
@@ -64,7 +73,7 @@ class MicronovaStove {
 
     void init(){
       StoveSerial.begin( 1200, SERIAL_MODE, pin_rx, pin_tx, false, 256 );
-      printf("begin stove serial");
+      if (dbg_out) printf("begin stove serial");
       pinMode( pin_rx_enable, OUTPUT );
       digitalWrite( pin_rx_enable, HIGH ); 
     }
@@ -84,10 +93,10 @@ class MicronovaStove {
     }
 
     void flushInput(){
-      printf("flush serial input\n");
+      if (dbg_out) printf("flush serial input\n");
       while (Serial.available()){
         Serial.read();
-        printf("flush: read 1 extra byte\n");
+        if (dbg_out) printf("flush: read 1 extra byte\n");
       }
     }
 
@@ -112,7 +121,7 @@ class MicronovaStove {
       StoveSerial.flush();
 
       enable_rx();
-      // the stove needs some time to answer
+      // the stove needs some time to answer, 120ms seems about the right amount, 110 is too short
       delay(120);
 
       if (dbg_out) printf("read stove answer\n");
@@ -123,13 +132,8 @@ class MicronovaStove {
       
       while ( StoveSerial.available() ) {
         if (rx_count>1){
+          // TODO: find a better way to do this
           rx_count = 0;
-          //printf("over 2 extra byte\n");
-          // while ( StoveSerial.available() ) {
-          //   StoveSerial.read();
-          //   printf("read 1 extra byte\n");
-          // }
-          // break;
         }
         stove_rx_data[rx_count] = StoveSerial.read();
         if (dbg_out) printf("i=0x%02x data=0x%02x\n",rx_count,stove_rx_data[rx_count]);
@@ -169,18 +173,19 @@ class MicronovaStove {
         data,
         chk
       };
-      printf("write data=");
+      if (dbg_out) printf("write data=");
       for ( int i = 0; i < 4; i++ ){
-        printf("0x%02x ", data_to_write[i] );
+        if (dbg_out) printf("0x%02x ", data_to_write[i] );
         StoveSerial.write( data_to_write[i] );
         delay(1);
       }
+      if (dbg_out) printf("\n");
 
-      printf("\n");
       // TODO: Read/verify answer
-      flushInput();
+      //flushInput();
 
     }
+
 
     void write_ram( uint8_t command, uint8_t data ){
       write( STOVE_OFFSET_RAM_WRITE, command, data );
@@ -188,6 +193,13 @@ class MicronovaStove {
 
     void write_eeprom( uint8_t command, uint8_t data ){
       write( STOVE_OFFSET_EEPROM_WRITE, command, data);
+    }
+
+    void simulate_infrared(uint8_t data, uint8_t repetitions){
+      for (uint8_t i=0; i<repetitions; i++){
+        write_ram(STOVE_ADDR_IRCOMMAND, data);
+        delay(100);
+      }
     }
 
     byte calculate_checksum( uint8_t dest, uint8_t addr, uint8_t val ){
@@ -198,6 +210,5 @@ class MicronovaStove {
       }
       return (uint8_t)checksum;
     }
-
 
 };

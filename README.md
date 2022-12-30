@@ -9,7 +9,7 @@ I only tested it with my own stove (*L'Asolana Marina*), but it should work with
 ### Protocol
 
 The stove has a half duplex serial port, meaning you can either send or recive. It only responds to commands and never sends something by its own. It seems that the protocol is called `Rwms`.
-The serial connection needs the followin settings:
+The serial connection needs the following settings:
 `1200 baud, 8 data bits, 2 stop bits, no parity, no flow control`.
 
 There are two accessible memories, `RAM` and `EEPROM`. `RAM` is volatile (but backed up by a battery) and can be rewrote many times safely. `EEPROM` is the memory used for storing permanent settings and should not be rewrote many times as writing cycles are limited (commonly 10-100k depending on the memory technology).
@@ -91,6 +91,7 @@ Those are only tested for my stove (*L'Asolana Marina*), it seems like there are
 | RAM | 0x7E | Day of Month |
 | RAM | 0x7F | Month |
 | RAM | 0x80 | Year since 2000 |
+| RAM | 0x58 | Infrared command, 0x54 P+, 0x50 P-, 0x52 T+, 0x58 T-, 0x5a PWR |
 | EEPROM | 0x7d | set temperature as 1:1 value | 
 | EEPROM | 0x7f | power, 1-4 | 
 | EEPROM | 0x25 | night mode, 0=off, 1=on |
@@ -118,10 +119,24 @@ State (`0x21`) has the following values for my stove:
 | 0x06  | Stopping, send to turn off |
 | 0x07  | Cooling down running, not sure if sending is safe |
 
+
+Turning the stove on works fine over writing `0x01` to `RAM 0x21`, turning it off (sending `0x06` to `RAM 0x21`) seems to be problematic. My stove enters "turning off mode" but takes pretty long to do so (~50min), so this is not the procedure used by programs or the power button which takes around 10min. Searching around in the internet told me that i am not the only one which has this issue. The stove also has a infrared control, which seem to write commands to `RAM 0x58`. So sending 10 times `0x5a` to `RAM 0x58` with a delay of `100ms` turns the stove off safeley.
+
+Sending various IR commands can be done by writing to `RAM 0x58` with a delay of `100ms`. To set power and temp, send it at least twice, for the power button (longpress) at least 10 times.
+
+| State | Description   |
+|-------|---------------|
+| 0x54  | Power +       |
+| 0x50  | Power -,      |
+| 0x52  | Temperature + |
+| 0x58  | Temperature - |
+| 0x5a  | Power ON/OFF  |
+
+
 Room temperature can be read in `0x01`, then divide the value by 2. The display of the stove cannot display decimal places but it seems that the sensor has an accuracy of 0.5°C. 
 
 The power (P1-P4) can be changed when writing to `EEPROM 0x7f` value `0x01 (P1) to 0x04 (P4)`, then the stove immediatley changes.
-Manually changing over the display seems to change it also in `RAM 0x34`, so i would recommend to write it there as well.
+Manually changing over the display seems to change it also in `RAM 0x34`, so i would recommend to write it there as well. Another possibility is to set the power over IR commands (see above)
 
 
 The fan speed can be calculated as follows:
