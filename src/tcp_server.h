@@ -16,10 +16,13 @@
 #define TCP_CMD_READ_EEPROM   0x11
 #define TCP_CMD_WRITE_RAM     0x20 
 #define TCP_CMD_WRITE_EEPROM  0x21
+#define TCP_CMD_IR_CMD        0x30
+
 
 #define TCP_ERR_GENERAL       0xFF
 #define TCP_ERR_LOCK          0xFE
-#define TCP_ERR_CHECKSUM      0xFE
+#define TCP_ERR_CHECKSUM      0xFD
+#define TCP_ERR_NOCMD         0xFC
 
 
 extern bool tcp_debug_on;

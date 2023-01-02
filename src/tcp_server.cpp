@@ -20,7 +20,7 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
     char reply[8];
 
     // TODO: checksum calculation
-    
+
     switch (cmd){
 
 
@@ -108,11 +108,30 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
             break;
 
 
+        case TCP_CMD_IR_CMD:
+            if (len!=3){
+                reply[0] = TCP_ERR_GENERAL;
+                reply_len = 1;
+                break;
+            }
+            if( !xSemaphoreTake( xStoveSemaphore, ( TickType_t ) STOVE_SEMAPHORE_WAIT_TICKS ) == pdTRUE ){
+                reply[0] = TCP_ERR_LOCK;
+                reply_len = 1; 
+                break;
+            }
+            reply[0] = TCP_CMD_IR_CMD;
+            reply_len = 1;
+            stove.simulate_infrared(rcv_data[1], rcv_data[2]);
+            xSemaphoreGive(xStoveSemaphore);
+            break;
+
+
         default:
+            reply[0] = TCP_ERR_NOCMD;
+            reply_len = 1;
             break;
     
     }
-
 
     // reply to client
     if (client->space() > 32 && client->canSend()){
