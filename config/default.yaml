@@ -1,1 +1,11 @@
 ---
+wifi:
+  ssid: none
+  pass: none 
+
+ifconfig:
+  static: 0
+  addr: 10.10.3.60
+  gateway: 10.10.1.1
+  netmask: 255.255.0.0
+  dns: 10.10.1.1
