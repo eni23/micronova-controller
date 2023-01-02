@@ -7,6 +7,7 @@ bool tcp_debug_on = true;
 //AsyncServer* server;
 
 
+
 void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
 
     if (tcp_debug_on) printf("data received from client %s \n", client->remoteIP().toString().c_str());
@@ -18,7 +19,8 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
     uint8_t reply_len = 0;
     char reply[8];
 
-    // TODO: aquire lock before doing stuff with the stove 
+    // TODO: checksum calculation
+    
     switch (cmd){
 
 
@@ -29,24 +31,42 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
 
 
         case TCP_CMD_ON:
+            if( !xSemaphoreTake( xStoveSemaphore, ( TickType_t ) STOVE_SEMAPHORE_WAIT_TICKS ) == pdTRUE ){
+                reply[0] = TCP_ERR_LOCK;
+                reply_len = 1; 
+                break;
+            }
             stove.on();
             reply[0] = TCP_CMD_ON;
             reply_len = 1;
+            xSemaphoreGive(xStoveSemaphore);
             break;
 
 
         case TCP_CMD_OFF:
+            if( !xSemaphoreTake( xStoveSemaphore, ( TickType_t ) STOVE_SEMAPHORE_WAIT_TICKS ) == pdTRUE ){
+                reply[0] = TCP_ERR_LOCK;
+                reply_len = 1; 
+                break;
+            }
             stove.off();
             reply[0] = TCP_CMD_OFF;
             reply_len = 1;
+            xSemaphoreGive(xStoveSemaphore);
             break;
 
 
         case TCP_CMD_READ_RAM:
         case TCP_CMD_READ_EEPROM:
             if (len!=2){
-                reply[0] = TCP_CMD_ERR;
+                reply[0] = TCP_ERR_GENERAL;
                 reply_len = 1;
+                break;
+            }
+            if( !xSemaphoreTake( xStoveSemaphore, ( TickType_t ) STOVE_SEMAPHORE_WAIT_TICKS ) == pdTRUE ){
+                reply[0] = TCP_ERR_LOCK;
+                reply_len = 1; 
+
                 break;
             }
             if (cmd == TCP_CMD_READ_RAM){
@@ -58,14 +78,20 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
             reply[0] = stove.last_read_checksum;
             reply[1] = stove.last_read_value;
             reply_len = 2;
+            xSemaphoreGive(xStoveSemaphore);
             break;
 
 
         case TCP_CMD_WRITE_RAM:
         case TCP_CMD_WRITE_EEPROM:
             if (len!=3){
-                reply[0] = TCP_CMD_ERR;
+                reply[0] = TCP_ERR_GENERAL;
                 reply_len = 1;
+                break;
+            }
+            if( !xSemaphoreTake( xStoveSemaphore, ( TickType_t ) STOVE_SEMAPHORE_WAIT_TICKS ) == pdTRUE ){
+                reply[0] = TCP_ERR_LOCK;
+                reply_len = 1; 
                 break;
             }
             if (cmd == TCP_CMD_WRITE_RAM){
@@ -74,9 +100,11 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
             else {
                 stove.write_eeprom(rcv_data[1], rcv_data[2]);
             }
-            // TODO: read stove reply and send it back instead of just returning cmd
-            reply[0] = cmd;
-            reply_len = 1;
+            stove.read_answer();
+            reply[0] = stove.last_read_value;
+            reply[1] = stove.last_read_value;
+            reply_len = 2;
+            xSemaphoreGive(xStoveSemaphore);
             break;
 
 

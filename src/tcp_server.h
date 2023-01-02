@@ -17,11 +17,12 @@
 #define TCP_CMD_WRITE_RAM     0x20 
 #define TCP_CMD_WRITE_EEPROM  0x21
 
-#define TCP_CMD_ERR           0xFF
+#define TCP_ERR_GENERAL       0xFF
+#define TCP_ERR_LOCK          0xFE
+#define TCP_ERR_CHECKSUM      0xFE
+
 
 extern bool tcp_debug_on;
-//extern AsyncServer* server;
-//extern AsyncServer server;
 
 extern void tcp_handle_new_cient(void* arg, AsyncClient* client);
 extern void tcp_handle_timeout(void* arg, AsyncClient* client, uint32_t time);

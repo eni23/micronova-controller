@@ -8,3 +8,6 @@ using namespace ESP32Console;
 
 extern MicronovaStove stove;
 extern Preferences settings;
+
+#define STOVE_SEMAPHORE_WAIT_TICKS  30
+extern SemaphoreHandle_t xStoveSemaphore;

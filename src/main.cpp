@@ -15,7 +15,7 @@ MicronovaStove stove = MicronovaStove(
     STOVE_PIN_EN_RX
 );
 Preferences settings;
-
+SemaphoreHandle_t xStoveSemaphore;
 
 
 
@@ -27,6 +27,11 @@ void setup() {
     
     // we begin stove and serial console before wifi
     stove.init();
+
+    // we create a lock for the stove serial and give it to be used
+    xStoveSemaphore = xSemaphoreCreateBinary(); 
+    xSemaphoreGive(xStoveSemaphore);
+
     init_console();
     
     settings.begin(PREFERENCES_NAMESPACE, false); 
@@ -38,6 +43,7 @@ void setup() {
 
     // wifi is at the end, so it is no-blocking
     wifi_connect();    
+
 
 }
 

@@ -85,7 +85,7 @@ class MicronovaStove {
     void write_eeprom( uint8_t command, uint8_t data );
     void simulate_infrared(uint8_t data, uint8_t repetitions );
     byte calculate_checksum( uint8_t dest, uint8_t addr, uint8_t val );
-
+    void read_answer();
 
     /* misc abstraction functions */
     void on();

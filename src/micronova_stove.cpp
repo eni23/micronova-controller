@@ -85,8 +85,8 @@ void MicronovaStove::read(uint8_t location, uint8_t addr){
       // TODO: find a better way to do this
       rx_count = 0;
     }
-  stove_rx_data[rx_count] = StoveSerial.read();
-  if (dbg_out) printf("i=0x%02x data=0x%02x\n",rx_count,stove_rx_data[rx_count]);
+    stove_rx_data[rx_count] = StoveSerial.read();
+    if (dbg_out) printf("i=0x%02x data=0x%02x\n",rx_count,stove_rx_data[rx_count]);
     rx_count++;
   }
 
@@ -136,9 +136,28 @@ void MicronovaStove::write( uint8_t location, uint8_t command, uint8_t data ){
     
   if (dbg_out) printf("\n");
 
-  // TODO: Read/verify answer
-  //flushInput();
+}
 
+
+void MicronovaStove::read_answer(){
+  enable_rx();
+  delay(120);
+  uint8_t rx_count = 0;
+  stove_rx_data[0] = 0x00;
+  stove_rx_data[1] = 0x00;
+      
+  while ( StoveSerial.available() ) {
+    if (rx_count>1){
+      // TODO: find a better way to do this
+      rx_count = 0;
+    }
+    stove_rx_data[rx_count] = StoveSerial.read();
+    rx_count++;
+  }
+  disable_rx();
+  last_read_value = stove_rx_data[1];
+  last_read_checksum = stove_rx_data[0];
+  
 }
 
 

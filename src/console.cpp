@@ -19,6 +19,17 @@ uint8_t convert_str_to_hex(String s){
     return ch;
 }
 
+bool aqquire_stove_lock(){
+    if( !xSemaphoreTake( xStoveSemaphore, ( TickType_t ) STOVE_SEMAPHORE_WAIT_TICKS ) == pdTRUE ){
+        printf("err: could not aqquire lock on stove\n");
+        return false;
+    }
+    return true;
+}
+
+void release_stove_lock(){
+    xSemaphoreGive(xStoveSemaphore);
+}
 
 
 void init_console(){
@@ -29,6 +40,10 @@ void init_console(){
     console.registerGPIOCommands();
 
 
+    /****
+    Stove functions
+    ****/
+
     // read-ram
     console.registerCommand(ConsoleCommandD("read-ram", [](int argc, char **argv) -> int {
         if (argc != 2){
@@ -36,8 +51,9 @@ void init_console(){
             return EXIT_FAILURE;
         }
         auto arg = String(argv[1]);
-        
+        if (!aqquire_stove_lock()) return EXIT_FAILURE;
         stove.read_ram(convert_str_to_hex(arg));
+        release_stove_lock();
         printf(" returned chk=0x%02x data=0x%02x param=0x%02x dec=%d ascii=%c\n", 
             stove.stove_rx_data[0], 
             stove.stove_rx_data[1], 
@@ -56,7 +72,9 @@ void init_console(){
             return EXIT_FAILURE;
         }
         auto arg = String(argv[1]);
+        if (!aqquire_stove_lock()) return EXIT_FAILURE;
         stove.read_eeprom(convert_str_to_hex(arg));
+        release_stove_lock();
         printf(" returned chk=0x%02x data=0x%02x param=0x%02x dec=%d ascii=%c\n", 
             stove.stove_rx_data[0], 
             stove.stove_rx_data[1], 
@@ -76,7 +94,9 @@ void init_console(){
         }
         auto addr = String(argv[1]);
         auto data = String(argv[2]);
+        if (!aqquire_stove_lock()) return EXIT_FAILURE;
         stove.write_ram(convert_str_to_hex(addr), convert_str_to_hex(data) );
+        release_stove_lock();
         return EXIT_SUCCESS;
     }, "Write to RAM"));
     
@@ -88,12 +108,15 @@ void init_console(){
         }
         auto addr = String(argv[1]);
         auto data = String(argv[2]);
+        if (!aqquire_stove_lock()) return EXIT_FAILURE;
         stove.write_eeprom(convert_str_to_hex(addr), convert_str_to_hex(data) );
+        release_stove_lock();
         return EXIT_SUCCESS;
     }, "Write to EEPROM"));
 
     // dump all of the ram
     console.registerCommand(ConsoleCommandD("dump-ram", [](int argc, char **argv) -> int {
+        if (!aqquire_stove_lock()) return EXIT_FAILURE;
         uint8_t resp;
         stove.dbg_out=false;
         for (int i=0; i<255; i++ ) {
@@ -101,6 +124,7 @@ void init_console(){
             printf("0x%02x|0x%02x|%d|%c\n",i,stove.last_read_value,stove.last_read_value,stove.last_read_value);
             delay(1);
         }
+        release_stove_lock();
         stove.dbg_out=true;
         return EXIT_SUCCESS;
     }, "read all ram addrs"));    
@@ -109,11 +133,13 @@ void init_console(){
     console.registerCommand(ConsoleCommandD("dump-eeprom", [](int argc, char **argv) -> int {
         uint8_t resp;
         stove.dbg_out=false;
+        if (!aqquire_stove_lock()) return EXIT_FAILURE;
         for (int i=0; i<255; i++ ) {
             stove.read_eeprom(i);
             printf("0x%02x|0x%02x|%d|%c\n",i,stove.last_read_value,stove.last_read_value,stove.last_read_value);
             delay(1);
         }
+        release_stove_lock();
         stove.dbg_out=true;
         return EXIT_SUCCESS;
 
@@ -122,12 +148,16 @@ void init_console(){
 
 
     console.registerCommand(ConsoleCommandD("stove-on", [](int argc, char **argv) -> int {
+        if (!aqquire_stove_lock()) return EXIT_FAILURE;
         stove.on();
+        release_stove_lock();
         return EXIT_SUCCESS;
     }, "Turn the stove on"));
     
     console.registerCommand(ConsoleCommandD("stove-off", [](int argc, char **argv) -> int {
+        if (!aqquire_stove_lock()) return EXIT_FAILURE;
         stove.off();
+        release_stove_lock();
         return EXIT_SUCCESS;
     }, "turn the stove off"));
 
