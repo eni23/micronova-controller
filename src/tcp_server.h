@@ -5,6 +5,20 @@
 #include "config.h"
 
 
+
+#define TCP_MAX_MSG_LEN       32
+
+// tcp server commands
+#define TCP_CMD_PING          0x01  
+#define TCP_CMD_ON            0x02
+#define TCP_CMD_OFF           0x03
+#define TCP_CMD_READ_RAM      0x10
+#define TCP_CMD_READ_EEPROM   0x11
+#define TCP_CMD_WRITE_RAM     0x20 
+#define TCP_CMD_WRITE_EEPROM  0x21
+
+#define TCP_CMD_ERR           0xFF
+
 extern bool tcp_debug_on;
 //extern AsyncServer* server;
 //extern AsyncServer server;

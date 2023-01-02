@@ -10,13 +10,85 @@ bool tcp_debug_on = true;
 void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
 
     if (tcp_debug_on) printf("data received from client %s \n", client->remoteIP().toString().c_str());
-    //Serial.write((uint8_t*)data, len);
+
+    uint8_t rcv_data[TCP_MAX_MSG_LEN];
+    memcpy(rcv_data, (uint8_t*)data, len);
+
+    uint8_t cmd = rcv_data[0];
+    uint8_t reply_len = 0;
+    char reply[8];
+
+    // TODO: aquire lock before doing stuff with the stove 
+    switch (cmd){
+
+
+        case TCP_CMD_PING:
+            reply[0] = 0x01;
+            reply_len = 1;
+            break;
+
+
+        case TCP_CMD_ON:
+            stove.on();
+            reply[0] = TCP_CMD_ON;
+            reply_len = 1;
+            break;
+
+
+        case TCP_CMD_OFF:
+            stove.off();
+            reply[0] = TCP_CMD_OFF;
+            reply_len = 1;
+            break;
+
+
+        case TCP_CMD_READ_RAM:
+        case TCP_CMD_READ_EEPROM:
+            if (len!=2){
+                reply[0] = TCP_CMD_ERR;
+                reply_len = 1;
+                break;
+            }
+            if (cmd == TCP_CMD_READ_RAM){
+                stove.read_ram(rcv_data[1]);
+            } 
+            else {
+                stove.read_eeprom(rcv_data[1]);
+            }
+            reply[0] = stove.last_read_checksum;
+            reply[1] = stove.last_read_value;
+            reply_len = 2;
+            break;
+
+
+        case TCP_CMD_WRITE_RAM:
+        case TCP_CMD_WRITE_EEPROM:
+            if (len!=3){
+                reply[0] = TCP_CMD_ERR;
+                reply_len = 1;
+                break;
+            }
+            if (cmd == TCP_CMD_WRITE_RAM){
+                stove.write_ram(rcv_data[1], rcv_data[2]);
+            } 
+            else {
+                stove.write_eeprom(rcv_data[1], rcv_data[2]);
+            }
+            // TODO: read stove reply and send it back instead of just returning cmd
+            reply[0] = cmd;
+            reply_len = 1;
+            break;
+
+
+        default:
+            break;
+    
+    }
+
 
     // reply to client
     if (client->space() > 32 && client->canSend()){
-        char reply[32];
-        sprintf(reply, "this is from esp\n");
-        client->add(reply, strlen(reply));
+        client->add(reply, reply_len);
         client->send();
     }
 }
