@@ -1,7 +1,6 @@
 #include "Arduino.h"
 #include "common.h"
 #include "config.h"
-#include "console.h"
 
 
 
@@ -13,4 +12,3 @@ extern uint32_t wifi_connect_ticks;
 extern void wifi_connect();
 extern void wifi_disconnect();
 extern void wifi_reconnect();
-

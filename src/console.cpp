@@ -7,6 +7,7 @@
 #include "console.h"
 #include "micronova_stove.h"
 #include "wifi.h"
+#include "tcp_server.h"
 
 
 
@@ -244,7 +245,6 @@ void init_console(){
         wifi_reconnect();
         return EXIT_SUCCESS;
     }, "reconnect wifi"));
-
 
 
 }

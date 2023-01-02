@@ -38,15 +38,14 @@ void wifi_connect(){
 
     wifi_connect_ticks = 0;
     while (WiFi.status() != WL_CONNECTED) {
-        printf(".");
+        //printf(".");
         delay(250);
         if (wifi_connect_ticks>WIFI_TRY_CONNECT_TICKS){
             printf("Error connecting after %i ticks\n", WIFI_TRY_CONNECT_TICKS);
             return;
         }
     }
-    printf("\n");
-
+    printf(" OK \n");
 }
 
 void wifi_disconnect(){
@@ -55,5 +54,8 @@ void wifi_disconnect(){
 
 void wifi_reconnect(){
     wifi_disconnect();
+    delay(100);
     wifi_connect();
 }
+
+
