@@ -120,7 +120,7 @@ State (`0x21`) has the following values for my stove:
 | 0x07  | Cooling down running, not sure if sending is safe |
 
 
-Turning the stove on works fine over writing `0x01` to `RAM 0x21`, turning it off (sending `0x06` to `RAM 0x21`) seems to be problematic. My stove enters "turning off mode" but takes pretty long to do so (~50min), so this is not the procedure used by programs or the power button which takes around 10min. Searching around in the internet told me that i am not the only one which has this issue. The stove also has a infrared control, which seem to write commands to `RAM 0x58`. So sending 10 times `0x5a` to `RAM 0x58` with a delay of `100ms` turns the stove off safeley.
+Turning the stove on works fine over writing `0x01` to `RAM 0x21`, turning it off (sending `0x06` to `RAM 0x21`) seems to be problematic. My stove enters "turning off mode" but takes pretty long to do so (~50min), so this is not the procedure used by programs or the power button which takes around 10min. Searching around in the internet told me that i am not the only one which has this issue. The stove also has a infrared control, which seem to write commands to `RAM 0x58`. So sending 10 times `0x5a` to `RAM 0x58` with a delay of `100ms` turns the stove off safley.
 
 Sending various IR commands can be done by writing to `RAM 0x58` with a delay of `100ms`. To set power and temp, send it at least twice, for the power button (longpress) at least 10 times.
 
