@@ -1,5 +1,6 @@
 import socket
 import struct
+import datetime
 
 
 # TCP server commands
@@ -211,4 +212,14 @@ class MicronovaClient:
         self.write_eeprom( STOVE_ADDR_THERMOSTAT, temp )
 
 
-        
+    def sync_clock(self):
+        now = datetime.datetime.now()
+        dow = self.convert_number_for_clock( 
+            datetime.datetime.today().strftime('%w')
+        )
+        minute = self.convert_number_for_clock( now.minute )
+        hour = self.convert_number_for_clock( now.hour )
+        day = self.convert_number_for_clock( now.day )
+        month = self.convert_number_for_clock( now.month )
+        year = self.convert_number_for_clock( now.year-2000 )
+        # todo: finish this
