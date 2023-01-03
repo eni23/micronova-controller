@@ -2,6 +2,7 @@
 #include "tcp_server.h"
 #include <WiFi.h>
 
+#include "crc8.h"
 
 bool tcp_debug_on = true;
 //AsyncServer* server;
@@ -20,6 +21,8 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
     char reply[8];
 
     // TODO: checksum calculation
+    //uint8_t checksum = crc8((uint8_t*)data, len);
+    //printf("checksum would be 0x%02x, last_byte=0x%02x\n", checksum, rcv_data[len-1]);
 
     switch (cmd){
 
@@ -84,7 +87,7 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
 
         case TCP_CMD_WRITE_RAM:
         case TCP_CMD_WRITE_EEPROM:
-            if (len!=3){
+            if (len<3){
                 reply[0] = TCP_ERR_GENERAL;
                 reply_len = 1;
                 break;
@@ -100,10 +103,15 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
             else {
                 stove.write_eeprom(rcv_data[1], rcv_data[2]);
             }
-            stove.read_answer();
-            reply[0] = stove.last_read_value;
-            reply[1] = stove.last_read_value;
-            reply_len = 2;
+            if ( len==4 & rcv_data[3]==0x01 ){
+                stove.read_answer();
+                reply[0] = stove.last_read_value;
+                reply[1] = stove.last_read_value;
+                reply_len = 2;
+            } else {
+                reply[0] = cmd;
+                reply_len = 1;
+            }
             xSemaphoreGive(xStoveSemaphore);
             break;
 

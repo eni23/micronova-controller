@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-uint8_t crc8(const uint8_t * const data, const size_t length);
+uint8_t crc8(uint8_t * const data, const size_t length);
 
 #ifdef __cplusplus
 }

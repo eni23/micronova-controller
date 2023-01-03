@@ -15,7 +15,7 @@ static inline uint8_t crc8_core(uint8_t data, uint8_t crc) {
 	return crc;
 }
 
-uint8_t crc8(const uint8_t * const data, const size_t length) {
+uint8_t crc8(uint8_t * const data, const size_t length) {
 	assert(data);
 	uint8_t crc = INIT;
 	for (size_t i = 0; i < length; i++)
