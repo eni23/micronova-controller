@@ -20,12 +20,16 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
     uint8_t reply_len = 0;
     char reply[8];
 
-    // TODO: checksum calculation
-    //uint8_t checksum = crc8((uint8_t*)data, len);
-    //printf("checksum would be 0x%02x, last_byte=0x%02x\n", checksum, rcv_data[len-1]);
+    // checksum calculation
+    uint8_t checksum = crc8((uint8_t*)data, len-1);
+    if (checksum != rcv_data[len-1]){
+        cmd = TCP_ERR_CHECKSUM;
+    }
+    
+    // remove checksum byte from length
+    len = len-1;
 
     switch (cmd){
-
 
         case TCP_CMD_PING:
             reply[0] = 0x01;
@@ -133,6 +137,12 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
             xSemaphoreGive(xStoveSemaphore);
             break;
 
+        
+        case TCP_ERR_CHECKSUM:
+            reply[0] = TCP_ERR_CHECKSUM;
+            reply_len = 1;
+            break;
+
 
         default:
             reply[0] = TCP_ERR_NOCMD;
@@ -143,6 +153,10 @@ void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
 
     // reply to client
     if (client->space() > 32 && client->canSend()){
+        // checksum addition
+        uint8_t resp_chk = crc8((uint8_t*)reply, reply_len);
+        reply[reply_len] = resp_chk;
+        reply_len++;
         client->add(reply, reply_len);
         client->send();
     }
