@@ -48,10 +48,6 @@ def crc8(data: bytes) -> int:
                 crc ^= polyval
     return crc & 0xff
 
-def hexlist(inp):
-    return [ hex(x) for x in inp ]
-
-
 
 class MicronovaClient:
     def __init__(self, hostname, port):
