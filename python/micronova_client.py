@@ -67,8 +67,15 @@ class MicronovaClient:
             socket.SOCK_STREAM
         )
     
+
     def close(self):
         self.socket.close()
+
+
+    def reconnect(self):
+        self.close()
+        self.create_socket()
+        self.connect()
 
 
     def connect(self):
