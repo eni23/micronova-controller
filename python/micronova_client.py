@@ -49,6 +49,7 @@ def crc8(data: bytes) -> int:
     return crc & 0xff
 
 
+
 class MicronovaClient:
     def __init__(self, hostname, port):
         self.hostname = hostname
@@ -162,6 +163,11 @@ class MicronovaClient:
     def off(self):
         self.simulate_infrared( STOVE_IR_POWER, 10 )
 
+    # WARNING: DO NOT USE IF NOT 100% NEEDED, 
+    # THIS CAN POTENTIALLY BREAK THE STOVE IF ITS RUNNING!!
+    def force_off(self):
+        self.write_ram( STOVE_ADDR_STATE, STOVE_STATE_FORCE_OFF )
+
     def get_ambient_temp(self):
         r = self.read_ram( STOVE_ADDR_AMBIENT_TEMP )
         return r[1] / 2
@@ -196,5 +202,6 @@ class MicronovaClient:
         if temp > 32:
             temp=32
         self.write_eeprom( STOVE_ADDR_THERMOSTAT, temp )
+
 
         
