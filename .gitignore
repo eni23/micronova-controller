@@ -1,3 +1,4 @@
 .pio
 config/*.yaml
 !config/default.yaml
+__pycache__
