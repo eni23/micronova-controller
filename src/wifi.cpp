@@ -18,10 +18,10 @@ void wifi_connect(){
         IPAddress subnet;
         IPAddress dnsserver;  
         
-        ip.fromString( settings.getString("if-ip") );
-        gateway.fromString( settings.getString("if-gw") );
-        subnet.fromString( settings.getString("if-nm") );
-        dnsserver.fromString( settings.getString("if-dns") );
+        ip.fromString( settings.getString("if-ip", IFCONFIG_ADDR) );
+        gateway.fromString( settings.getString("if-gw", IFCONFIG_GATEWAY) );
+        subnet.fromString( settings.getString("if-nm", IFCONFIG_NETMASK) );
+        dnsserver.fromString( settings.getString("if-dns", IFCONFIG_DNS) );
 
         if (! WiFi.config(ip, gateway, subnet, dnsserver) ){
             printf("ERR: static wifi config failed\n");
@@ -32,7 +32,10 @@ void wifi_connect(){
     WiFi.setAutoReconnect(true);
     WiFi.mode(WIFI_STA);
 
-    WiFi.begin(settings.getString("wifi-ssid").c_str(), settings.getString("wifi-pass").c_str());
+    WiFi.begin(
+        settings.getString("wifi-ssid", WIFI_SSID).c_str(), 
+        settings.getString("wifi-pass", WIFI_PASS).c_str()
+    );
 
     printf("Connecting to WiFi ");
 

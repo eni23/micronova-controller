@@ -214,13 +214,14 @@ void init_console(){
                 printf("current config: DHCP\n");
             } else {
                 printf("current config: static\n ipaddress: %s\n gateway: %s\n netmask: %s\n dns-server: %s\n",
-                    settings.getString("if-ip"),
-                    settings.getString("if-gw"),
-                    settings.getString("if-nm"),
-                    settings.getString("if-dns")
+                    settings.getString("if-ip", IFCONFIG_ADDR),
+                    settings.getString("if-gw", IFCONFIG_GATEWAY),
+                    settings.getString("if-nm", IFCONFIG_NETMASK),
+                    settings.getString("if-dns", IFCONFIG_DNS)
                 );
             }
-            
+
+            printf("configured TCP port: %i\n", settings.getUInt("tcp-port", TCP_SERVER_PORT));
             return EXIT_SUCCESS;
         }
         if (argc == 2){
@@ -249,6 +250,23 @@ void init_console(){
         settings.clear();
         return EXIT_SUCCESS;
     }, "delete all settings"));
+
+    console.registerCommand(ConsoleCommandD("set-tcp-port", [](int argc, char **argv) -> int {
+        if (argc != 2){
+            printf("usage: set-tcp-port [PORTNUM]\n");
+            return EXIT_FAILURE;
+        }
+        uint16_t port = '\0';
+        sscanf(argv[1], "%u", &port);
+        if (port<1){
+            printf("err: port needs to be bigger than 0\n");
+            return EXIT_FAILURE;
+        }
+        settings.putUInt("tcp-port", port);
+        printf("port configured to: %i. please run 'restart' to apply.\n", port);
+        return EXIT_SUCCESS;
+    }, "delete all settings"));
+
 
 
 

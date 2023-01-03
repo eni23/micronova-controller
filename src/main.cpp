@@ -37,9 +37,10 @@ void setup() {
     settings.begin(PREFERENCES_NAMESPACE, false); 
     
     // init server
-    AsyncServer* server = new AsyncServer(TCP_SERVER_PORT); 
+    AsyncServer* server = new AsyncServer(settings.getUInt("tcp-port", TCP_SERVER_PORT)); 
     server->onClient(&tcp_handle_new_cient, server);
     server->begin();
+    printf("TCP server running on 0.0.0.0:%i\n", settings.getUInt("tcp-port", TCP_SERVER_PORT));
 
     // wifi is at the end, so it is no-blocking
     wifi_connect();    
