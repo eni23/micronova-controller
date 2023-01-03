@@ -21,7 +21,7 @@ STOVE_ADDR_AMBIENT_TEMP = 0x01
 STOVE_ADDR_STATE = 0x21
 STOVE_ADDR_FUMES_TEMP = 0x3E
 STOVE_ADDR_FUMES_SPEED = 0x37
-STOVE_ADDR_POWER_RAM = 0x34
+STOVE_ADDR_POWER_RAM = 0x19
 STOVE_ADDR_POWER_EEPROM = 0x7F
 STOVE_ADDR_IRCOMMAND = 0x58
 STOVE_ADDR_THERMOSTAT = 0x7D
@@ -151,6 +151,9 @@ class MicronovaClient:
         self.send(cmd)
         return self.recive()
 
+    # helpers
+    def convert_number_for_clock(self, numer):
+        return int(str(number),16)
 
     # abstraction functions
     def get_stove_state(self):
@@ -187,6 +190,10 @@ class MicronovaClient:
             power = 4
         self.write_eeprom(STOVE_ADDR_POWER_EEPROM, power)
         self.write_ram(STOVE_ADDR_POWER_RAM, power)
+
+    def get_power(self):
+        r = self.read_eeprom( STOVE_ADDR_POWER_EEPROM )
+        return r[0]
 
     def get_air_out_temp(self):
         r = self.read_ram(0x02)
