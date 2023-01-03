@@ -79,7 +79,16 @@ class MicronovaClient:
     def connect(self):
         self.socket.connect( (self.hostname, self.port) )
     
+
+    def ping(self):
+        self.send( struct.pack("=B", TCP_CMD_PING) )
+        res = self.recive()
+        if res[0]==TCP_CMD_PING:
+            return True
+        else:
+            return False
     
+
     def send(self, message):
         message+=bytes( [crc8(message) ])
         self.socket.sendall(message)
@@ -153,7 +162,7 @@ class MicronovaClient:
         return self.recive()
 
     # helpers
-    def convert_number_for_clock(self, numer):
+    def convert_number_for_clock(self, number):
         return int(str(number),16)
 
     # abstraction functions
@@ -194,7 +203,7 @@ class MicronovaClient:
 
     def get_power(self):
         r = self.read_eeprom( STOVE_ADDR_POWER_EEPROM )
-        return r[0]
+        return r[1]
 
     def get_air_out_temp(self):
         r = self.read_ram(0x02)
@@ -211,15 +220,3 @@ class MicronovaClient:
             temp=32
         self.write_eeprom( STOVE_ADDR_THERMOSTAT, temp )
 
-
-    def sync_clock(self):
-        now = datetime.datetime.now()
-        dow = self.convert_number_for_clock( 
-            datetime.datetime.today().strftime('%w')
-        )
-        minute = self.convert_number_for_clock( now.minute )
-        hour = self.convert_number_for_clock( now.hour )
-        day = self.convert_number_for_clock( now.day )
-        month = self.convert_number_for_clock( now.month )
-        year = self.convert_number_for_clock( now.year-2000 )
-        # todo: finish this
