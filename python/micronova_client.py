@@ -1,6 +1,5 @@
 import socket
 import struct
-import datetime
 
 
 # TCP server commands
