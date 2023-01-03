@@ -32,23 +32,21 @@ void setup() {
     xStoveSemaphore = xSemaphoreCreateBinary(); 
     xSemaphoreGive(xStoveSemaphore);
 
-    init_console();
-    
+    // load "EEPROM" settings
     settings.begin(PREFERENCES_NAMESPACE, false); 
-    
-    // init server
-    AsyncServer* server = new AsyncServer(settings.getUInt("tcp-port", TCP_SERVER_PORT)); 
-    server->onClient(&tcp_handle_new_cient, server);
-    server->begin();
-    printf("TCP server running on 0.0.0.0:%i\n", settings.getUInt("tcp-port", TCP_SERVER_PORT));
 
-    // wifi is at the end, so it is no-blocking
-    wifi_connect();    
+    // start serial console
+    init_console();
+        
+    // init tcp server
+    tcp_init_server();
 
+    // wifi is at the end, so it is no-blocking even when it's not
+    wifi_connect();
 
 }
 
 
 void loop() {
-    // its all async :)
+    // it's all async :)
 }

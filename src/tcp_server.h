@@ -33,4 +33,4 @@ void tcp_handle_disconnect(void* arg, AsyncClient* client);
 void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len);
 void tcp_handle_error(void* arg, AsyncClient* client, int8_t error);
 
-extern void tcp_init_server();
+void tcp_init_server();

@@ -1,13 +1,9 @@
 #include "Arduino.h"
 #include "tcp_server.h"
-#include <WiFi.h>
 
 #include "crc8.h"
 
 bool tcp_debug_on = true;
-//AsyncServer* server;
-
-
 
 void tcp_handle_data(void* arg, AsyncClient* client, void *data, size_t len){
 
@@ -194,12 +190,9 @@ void tcp_handle_new_cient(void* arg, AsyncClient* client){
 }
 
 
-// TODO: find out why this crashes but works in setup()
 void tcp_init_server(){
-    if (tcp_debug_on) printf("starting server on port %s\n", TCP_SERVER_PORT);
-
-    WiFi.mode(WIFI_STA);
-    AsyncServer* server = new AsyncServer(TCP_SERVER_PORT); 
+    AsyncServer* server = new AsyncServer(settings.getUInt("tcp-port", TCP_SERVER_PORT)); 
     server->onClient(&tcp_handle_new_cient, server);
     server->begin();
+    printf("TCP server running on 0.0.0.0:%i\n", settings.getUInt("tcp-port", TCP_SERVER_PORT));
 }
