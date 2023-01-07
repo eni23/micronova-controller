@@ -39,6 +39,7 @@ void init_console(){
     console.registerSystemCommands();
     console.registerGPIOCommands();
 
+    
 
     /****
     Stove functions
@@ -293,6 +294,12 @@ void init_console(){
         wifi_reconnect();
         return EXIT_SUCCESS;
     }, "reconnect wifi"));
+
+    // TODO: move this to a rtos timer
+    console.registerCommand(ConsoleCommandD("t", [](int argc, char **argv) -> int {
+        linenoiseSetDumbMode(0);
+        return EXIT_SUCCESS;
+    }, "init terminal"));
 
 
 }
