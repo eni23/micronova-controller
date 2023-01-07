@@ -3,6 +3,10 @@
 This repo contains documentation and code to interface with a pellet stove based on Micronova controllers.
 I only tested it with my own stove (*L'Asolana Marina*), but it should work with all Micronova based stoves. Please note that the `RAM` and `EEPROM` mappings will probably be different for other models.
 
+The code is designed to run on a ESP32 and provides a simple TCP socket based protocol to communicate with the stove. There is a python module in `./python` to interface with the TCP server in a easy way. The ESP also has a simple, interactive serial shell to communicate with the stove.
+
+This is work in progress. MR's for more features (for example: MQTT, HTTP-API) are welcome!
+
 
 ## Stove
 
@@ -168,7 +172,7 @@ There is a Arduino library in `src/micronova_stove.hpp` which makes interfacing 
 It can be used like this:
 
 ```cpp
-#include "micronova_stove.hpp"
+#include "micronova_stove.h"
 
 // create the stove object
 MicronovaStove stove( stove_pin_rx, stove_pin_tx, stove_pin_rx_enable );
@@ -195,9 +199,66 @@ void loop(){
   // write 0x01 to location 0x25 in EEPROM
   stove.write_eeprom(0x21,0x01);
 
+  // turn the stove on
+  stove.on();
+
+  // turn it off
+  stove.off();
+
 }
+```
+
+### Software
+
+#### ESP Configuration
+
 
 ```
+# open up a serial console to the device, this will give you a interactive shell
+make monitor
+
+# read stove state to see if everything works 
+read-ram 0x21
+
+# configure wifi ssid & pass
+wificonfig ssid-name ssid-password
+
+# configure static IP (ip, gateway, netmask, dns-server)
+ifconfig static 10.10.3.60 10.10.1.1 255.255.0.0 10.10.1.1
+
+# configure dhcp
+ifconfig dhcp
+
+# set port for the tcp server 
+set-tcp-port 9040
+
+# restart to take effect of the settings
+restart
+
+# check internet connection
+ifconfig
+```
+
+#### Python module
+
+```python
+from python.micronova_client import MicronovaClient
+
+stove = MicronovaClient("10.10.3.60",9040)
+stove.connect()
+
+print(stove.stove.get_ambient_temp())
+print(stove.stove.get_stove_state())
+
+res = stove.read_ram(0x21)
+print(res)
+
+stove.on()
+stove.off()
+
+stove.close()
+```
+
 
 ### Interface Circuit
 
@@ -221,6 +282,13 @@ The circuit is based on the one from [philibertc/micronova_controller](https://g
 #### Connector on stove
 
 ![connector](doc/connector.png)
+
+#### Pinout Board
+
+(This is my personal board, you have to build one on your own)
+
+![pinout](doc/pinout-board.png)
+
 
 
 
