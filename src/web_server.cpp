@@ -210,9 +210,9 @@ void web_init_server(){
                 request->send(500, "text/plain", "err_param");
                 return;
             }
-            for (uint8_t i=0; i<3; i++){
+            for (uint8_t i=0; i<2; i++){
                 stove.write_ram(STOVE_ADDR_IRCOMMAND, cmd);
-                delay(50);
+                delay(80);
             }
             xSemaphoreGive(xStoveSemaphore);
             request->send(200, "text/json", "OK");

@@ -40,8 +40,8 @@
 
 
 // IRCOMMANDS
-#define STOVE_IR_POWERUP          0x54
-#define STOVE_IR_POWERDOWN        0x50
+#define STOVE_IR_POWERUP          0x50
+#define STOVE_IR_POWERDOWN        0x54
 #define STOVE_IR_TEMPUP           0x52
 #define STOVE_IR_TEMPDOWN         0x58
 #define STOVE_IR_POWER            0x5A

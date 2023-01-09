@@ -8,7 +8,7 @@ all:
 	platformio -f -c vim run
 
 upload: monitor-close
-	pio run --target upload --verbose
+	pio run --target upload
 
 upload-reopen-monitor: all upload monitor-notify-done
 
@@ -25,7 +25,7 @@ update: --verbose
 	pio run -t update
 
 inotify-watch-upload:
-	-tools/inotify-upload.sh lib/TFT_ST7735/_usr/ src/
+	-tools/inotify-upload.sh src/
 
 find-serial:
 	ls -1 $(SERIAL_DEVICE)

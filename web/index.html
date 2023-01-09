@@ -178,11 +178,12 @@
         // redraw button state
         function update_ctrl_button_state(){
           // stove is in startup, grey out button
-          if (stove_state.state != '0x04' && stove_state != '0x01'){
+          if (stove_state.state != '0x04' && stove_state != '0x00'){
             btn_ctrl.innerText="Stove starting";
             btn_ctrl.classList.remove('green','red');
             btn_ctrl.classList.remove('red');
             btn_ctrl.classList.add('grey');
+            return;
           }
           if (stove_state.state == '0x04') {
             btn_ctrl.innerText="Turn Stove OFF";
@@ -220,7 +221,6 @@
             }
             // update elements
             document.getElementById('val_state').innerText = power_states[stove_state.state];
-            document.getElementById('val_power').innerText = parseInt(stove_state.power);
             document.getElementById('val_ambtemp').innerText = parseInt(stove_state.ambient)/2 + " °C";
             document.getElementById('val_fumestemp').innerText = parseInt(stove_state.fumes) + " °C";
             document.getElementById('val_fanspeed').innerText = parseInt(stove_state.fan) * 10 + " RPM";
@@ -233,7 +233,6 @@
               stove_state.power = data['0x7F'];
               document.getElementById('val_power').innerText = parseInt(stove_state.power);
               // redo the timer
-              console.log(stove_state);
               update_refresh_timer();
             });
 
@@ -250,7 +249,6 @@
           // do nothing when stove is in startup mode
           if (stove_state.state != '0x04' && stove_state.state != '0x00'){
             console.log("stove in wrong mode");
-            console.log(stove_state);
             return;
           }
           if (!btn_ctrl_confirm_state){
@@ -290,7 +288,7 @@
             body: ["go=up"]
           })
           update_refresh_timer();
-          setTimeout(update_stove_state, 1000);
+          setTimeout(update_stove_state, 8000);
         });
 
         // button down
@@ -302,7 +300,7 @@
             body: ["go=down"]
           })
           update_refresh_timer();
-          setTimeout(update_stove_state, 1000);
+          setTimeout(update_stove_state, 8000);
         });
 
         // refresh interval change
