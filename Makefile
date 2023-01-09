@@ -13,15 +13,15 @@ upload: monitor-close
 upload-reopen-monitor: all upload monitor-notify-done
 
 clean:
-	platformio -f -c vim run --target clean --verbose
+	platformio -f -c vim run --target clean 
 
 program:
-	platformio -f -c vim run --target program --verbose
+	platformio -f -c vim run --target program 
 
 uploadfs:
-	platformio -f -c vim run --target uploadfs --verbose
+	platformio -f -c vim run --target uploadfs
 
-update: --verbose
+update:
 	pio run -t update
 
 inotify-watch-upload:
