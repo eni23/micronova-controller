@@ -178,7 +178,7 @@
         // redraw button state
         function update_ctrl_button_state(){
           // stove is in startup, grey out button
-          if (stove_state.state != '0x04' && stove_state != '0x00'){
+          if (stove_state.state != '0x04' && stove_state.state != '0x00'){
             if (stove_state.state == '0x06'){
               btn_ctrl.innerText="Stove stopping";
             } else {
