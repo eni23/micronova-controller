@@ -57,6 +57,9 @@
       button.blue {
         background-color: rgb(39, 46, 86);
       }
+      button.gray {
+        background-color: rgb(89, 90, 95);
+      }
       button.control {
         border: 1px rgb(138, 141, 144);
         color:rgb(243, 249, 255);
@@ -99,29 +102,29 @@
 
     <main>
       <div class="control">
-        <button id="btn_ctrl" class="control green">please wait..</button>
+        <button id="btn_ctrl" class="control gray">please wait..</button>
         <button id="btn_pwrdwn" class="control power green">Power -</button>
         <button id="btn_pwrup" class="control power green">Power +</button>
       </div>
       <div class="info">
         <div class="label">Stove state</div>
-        <div class="value" id="val_state">OFF</div>
+        <div class="value" id="val_state"></div>
       </div>
       <div class="info">
         <div class="label">Power</div>
-        <div class="value" id="val_power"">3</div>
+        <div class="value" id="val_power""></div>
       </div>
       <div class="info">
         <div class="label">Ambient temperature</div>
-        <div class="value" id="val_ambtemp">6.5°C</div>
+        <div class="value" id="val_ambtemp"></div>
       </div>
       <div class="info">
         <div class="label">Fumes temperature</div>
-        <div class="value" id="val_fumestemp">10°C</div>
+        <div class="value" id="val_fumestemp"></div>
       </div>
       <div class="info">
         <div class="label">Fumes Fan speed</div>
-        <div class="value" id="val_fanspeed">1500 RPM</div>
+        <div class="value" id="val_fanspeed"></div>
       </div>
 
       <div class="refresh">
@@ -144,6 +147,7 @@
     <script lang="text/javascript">
         // define global vars
         var apiurl = window.location.href + "api";
+        var apiurl = "http://10.10.3.61/api";
         var refresh_time = 10; // time in secs 
         var refresh_timer = false;
         var confirm_timeout_timer = false;
@@ -161,50 +165,79 @@
           "0x02": "START 1",
           "0x03": "START 2",
           "0x04": "RUNNING",
-          "0x06": "STOPPING"
+          "0x06": "STOPPING",
+          "0x08": "ERROR"
         }
         var btn_ctrl = document.getElementById('btn_ctrl');
         var btn_ctrl_confirm_state = false;
 
-        // define helper functions
+        // helper: int to hex string
         function toHex(d) {
           return  "0x" + ("0"+(Number(d).toString(16))).slice(-2).toUpperCase()
         }
 
+        // redraw button state
         function update_ctrl_button_state(){
-          if (stove_running) {
+          // stove is in startup, grey out button
+          if (stove_state.state != '0x04' && stove_state != '0x01'){
+            btn_ctrl.innerText="Stove starting";
+            btn_ctrl.classList.remove('green','red');
+            btn_ctrl.classList.remove('red');
+            btn_ctrl.classList.add('grey');
+          }
+          if (stove_state.state == '0x04') {
             btn_ctrl.innerText="Turn Stove OFF";
-            btn_ctrl.classList.remove('green');
+            btn_ctrl.classList.remove('green','gray');
             btn_ctrl.classList.add('red');
           } else {
             btn_ctrl.innerText="Turn Stove ON";
-            btn_ctrl.classList.remove('red');
+            btn_ctrl.classList.remove('red','gray');
             btn_ctrl.classList.add('green');
           }
         }
 
+        // recreate timer for displaying values
+        function update_refresh_timer(){
+          clearInterval(refresh_timer);
+          refresh_timer = setTimeout(update_stove_state, refresh_time*1000);
+        }
+
+        // fetch values from stove
         function update_stove_state(){
           console.log("update state");
-          fetch(apiurl +'/ram?addr=0x01,0x21,0x3E,0x37,0x34')
+          fetch(apiurl +'/ram?addr=0x01,0x21,0x3E,0x37')
           .then((response) => response.json())
           .then((data) => {
+            // parse states
             stove_state.state = toHex(data['0x21']);
             stove_state.power = data['0x34'];
             stove_state.ambient = data['0x01'];
             stove_state.fumes = data['0x3E'];
             stove_state.fan = data['0x37'];
-            if (stove_state.state==4 || stove_state.state == 2 || stove_state == 1){
+            if (stove_state.state==4 || stove_state.state==3 || stove_state==2 || stove_state==1 ){
               stove_running=true;
             } else {
               stove_running = false;
             }
+            // update elements
             document.getElementById('val_state').innerText = power_states[stove_state.state];
             document.getElementById('val_power').innerText = parseInt(stove_state.power);
             document.getElementById('val_ambtemp').innerText = parseInt(stove_state.ambient)/2 + " °C";
             document.getElementById('val_fumestemp').innerText = parseInt(stove_state.fumes) + " °C";
             document.getElementById('val_fanspeed').innerText = parseInt(stove_state.fan) * 10 + " RPM";
+            // we can also already update the button
             update_ctrl_button_state();
-            refresh_timer = setTimeout(update_stove_state, refresh_time*1000);
+            // but power is in EEPROM, so fetch this as well
+            fetch(apiurl +'/eeprom?addr=0x7F')
+            .then((response) => response.json())
+            .then((data) => {
+              stove_state.power = data['0x7F'];
+              document.getElementById('val_power').innerText = parseInt(stove_state.power);
+              // redo the timer
+              console.log(stove_state);
+              update_refresh_timer();
+            });
+
           });
         }
 
@@ -213,14 +246,14 @@
           update_stove_state();
         });
 
-
-        function reset_button_confirm_state(){
-          btn_ctrl_confirm_state = false;
-          update_ctrl_button_state();
-        }
-
-        // add button events
+        // button on/off
         btn_ctrl.addEventListener('click', ()=>{
+          // do nothing when stove is in startup mode
+          if (stove_state.state != '0x04' && stove_state.state != '0x00'){
+            console.log("stove in wrong mode");
+            console.log(stove_state);
+            return;
+          }
           if (!btn_ctrl_confirm_state){
             if (confirm_timeout_timer){
               clearTimeout(confirm_timeout_timer);
@@ -228,7 +261,10 @@
             btn_ctrl_confirm_state = true;
             btn_ctrl.innerText="Confirm";
             // reset button to orig state after 6 secs
-            confirm_timeout_timer = setTimeout(reset_button_confirm_state, 6000);
+            confirm_timeout_timer = setTimeout(()=>{
+              btn_ctrl_confirm_state = false;
+              update_ctrl_button_state();
+            }, 6000);
             return;
           }
           btn_ctrl_confirm_state = false;
@@ -243,10 +279,10 @@
           }
           btn_ctrl.innerText="please wait..";
           // give the stove some time first
+          update_refresh_timer();
           setTimeout(update_stove_state, 1500);
           //update_ctrl_button_state();
         });
-
 
         // button up
         document.getElementById('btn_pwrup').addEventListener('click', ()=>{
@@ -256,8 +292,10 @@
             headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
             body: ["go=up"]
           })
+          update_refresh_timer();
           setTimeout(update_stove_state, 1500);
         });
+
         // button down
         document.getElementById('btn_pwrdwn').addEventListener('click', ()=>{
           console.log("pwr DOWN");
@@ -266,14 +304,14 @@
             headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
             body: ["go=down"]
           })
+          update_refresh_timer();
           setTimeout(update_stove_state, 1500);
         });
 
-        // refresh interval
+        // refresh interval change
         document.getElementById('refresh_select').addEventListener('change', function() {
           refresh_time = this.value;
-          clearInterval(refresh_timer);
-          refresh_timer = setTimeout(update_stove_state, refresh_time*1000);
+          update_refresh_timer();
         });
 
     </script>
