@@ -147,7 +147,6 @@
     <script lang="text/javascript">
         // define global vars
         var apiurl = window.location.href + "api";
-        var apiurl = "http://10.10.3.61/api";
         var refresh_time = 10; // time in secs 
         var refresh_timer = false;
         var confirm_timeout_timer = false;
@@ -271,11 +270,9 @@
           if (!stove_running){
             console.log("turn stove ON");
             fetch(apiurl +'/on', {method: 'POST'})
-            //stove_running=true;
           } else {
             console.log("turn stove OFF");
             fetch(apiurl +'/off', {method: 'POST'})
-            //stove_running=false;
           }
           btn_ctrl.innerText="please wait..";
           // give the stove some time first
@@ -293,7 +290,7 @@
             body: ["go=up"]
           })
           update_refresh_timer();
-          setTimeout(update_stove_state, 1500);
+          setTimeout(update_stove_state, 1000);
         });
 
         // button down
@@ -305,7 +302,7 @@
             body: ["go=down"]
           })
           update_refresh_timer();
-          setTimeout(update_stove_state, 1500);
+          setTimeout(update_stove_state, 1000);
         });
 
         // refresh interval change
