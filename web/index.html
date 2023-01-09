@@ -207,7 +207,6 @@
 
         // fetch values from stove
         function update_stove_state(){
-          console.log("update state");
           fetch(apiurl +'/ram?addr=0x01,0x21,0x3E,0x37')
           .then((response) => response.json())
           .then((data) => {
