@@ -5,7 +5,9 @@ I only tested it with my own stove (*L'Asolana Marina*), but it should work with
 
 The code is designed to run on a ESP32 and provides a simple TCP socket based protocol to communicate with the stove. There is a python module in `./python` to interface with the TCP server in a easy way. The ESP also has a simple, interactive serial shell to communicate with the stove.
 
-This is work in progress. MR's for more features (for example: MQTT, HTTP-API) are welcome!
+If enabled in the build options, the ESP will also provide a HTTP-API with a simple web-interface.
+
+This is work in progress. MR's for more features (for example: MQTT, more locations) are welcome!
 
 
 ## Stove
@@ -209,6 +211,14 @@ void loop(){
 ```
 
 ### Software
+
+#### Web
+
+![pinout](doc/web-screenshot.png)
+
+Default port is 80. Can be changed.
+
+
 
 #### ESP Configuration
 

@@ -9,6 +9,11 @@
 #include "wifi.h"
 #include "tcp_server.h"
 
+#if WEB_SERVER_ENABLE == True
+    #include "web_server.h"
+#endif
+
+
 MicronovaStove stove = MicronovaStove(
     STOVE_PIN_RX,
     STOVE_PIN_TX,
@@ -40,6 +45,10 @@ void setup() {
         
     // init tcp server
     tcp_init_server();
+
+    #if WEB_SERVER_ENABLE == True
+        web_init_server();
+    #endif
 
     // wifi is at the end, so it is no-blocking even when it's not
     wifi_connect();
