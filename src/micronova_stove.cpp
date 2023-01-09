@@ -169,13 +169,6 @@ void MicronovaStove::write_eeprom( uint8_t command, uint8_t data ){
   write( STOVE_OFFSET_EEPROM_WRITE, command, data);
 }
 
-void MicronovaStove::simulate_infrared(uint8_t data, uint8_t repetitions){
-  for (uint8_t i=0; i<repetitions; i++){
-    write_ram(STOVE_ADDR_IRCOMMAND, data);
-    delay(100);
-  }
-}
-
 
 byte MicronovaStove::calculate_checksum( uint8_t dest, uint8_t addr, uint8_t val ){
   uint8_t checksum = 0;
@@ -190,6 +183,10 @@ byte MicronovaStove::calculate_checksum( uint8_t dest, uint8_t addr, uint8_t val
 
 
 /* Abstraction helper functions */
+uint8_t MicronovaStove::get_state(){
+  read_ram(STOVE_ADDR_STATE);
+  return last_read_value;
+}
 
 void MicronovaStove::on(){
   write_ram(STOVE_ADDR_STATE, STOVE_STATE_TURN_ON);
@@ -240,4 +237,11 @@ void MicronovaStove::set_thermostat(uint8_t temperature){
     temperature = 32;
   }
   write_eeprom(STOVE_ADDR_THERMOSTAT, temperature);
+}
+
+void MicronovaStove::simulate_infrared(uint8_t data, uint8_t repetitions){
+  for (uint8_t i=0; i<repetitions; i++){
+    write_ram(STOVE_ADDR_IRCOMMAND, data);
+    delay(100);
+  }
 }

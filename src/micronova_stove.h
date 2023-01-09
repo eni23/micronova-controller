@@ -88,6 +88,7 @@ class MicronovaStove {
     void read_answer();
 
     /* misc abstraction functions */
+    uint8_t get_state();
     void on();
     void off();
     float get_ambient_temp();

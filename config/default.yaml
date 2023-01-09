@@ -12,3 +12,9 @@ ifconfig:
   dns: 10.10.1.1
 
 tcp_server_port: 9040
+
+
+# enabling & configuring web server only supported during build time
+web_server:
+  enable: true
+  port: 80
