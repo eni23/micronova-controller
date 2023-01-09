@@ -165,7 +165,6 @@ void web_init_server(){
         }
         stove.on();
         xSemaphoreGive(xStoveSemaphore);
-        String answer="{\"status\":\"ok\"}";
         request->send(200, "text/plain", "OK");
     });
 
@@ -183,9 +182,9 @@ void web_init_server(){
             request->send(500, "text/plain", "err_stovestate");
             return;
         }
+        printf("turn stove off \n");
         stove.off();
         xSemaphoreGive(xStoveSemaphore);
-        String answer="{\"status\":\"ok\"}";
         request->send(200, "text/plain", "OK");
     });
 
@@ -215,10 +214,10 @@ void web_init_server(){
                 delay(80);
             }
             xSemaphoreGive(xStoveSemaphore);
-            request->send(200, "text/json", "OK");
+            request->send(200, "text/plain", "OK");
             return;
         } 
-        request->send(500, "text/json", "err_param");
+        request->send(500, "text/plain", "err_param");
     });
 
 

@@ -194,7 +194,7 @@ void MicronovaStove::on(){
 
 
 void MicronovaStove::off(){
-  simulate_infrared(STOVE_IR_POWER, 8);
+  simulate_infrared(STOVE_IR_POWER, 15);
 }
 
 
@@ -242,6 +242,6 @@ void MicronovaStove::set_thermostat(uint8_t temperature){
 void MicronovaStove::simulate_infrared(uint8_t data, uint8_t repetitions){
   for (uint8_t i=0; i<repetitions; i++){
     write_ram(STOVE_ADDR_IRCOMMAND, data);
-    delay(100);
+    delay(80);
   }
 }
