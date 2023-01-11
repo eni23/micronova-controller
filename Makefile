@@ -33,4 +33,7 @@ find-monitor-baud:
 	$(eval MONITOR_BAUD=$(shell tools/config-value.sh SERIAL_BAUD ))
 
 monitor: find-monitor-baud
-	@pio device monitor --baud $(MONITOR_BAUD) --raw --quiet
+	@pio device monitor --baud $(MONITOR_BAUD) --raw --quiet --no-reconnect
+
+screen-monitor: find-serial find-monitor-baud
+	screen $(USBTTY) $(MONITOR_BAUD)
