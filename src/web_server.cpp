@@ -210,7 +210,7 @@ void web_init_server(){
                 }
             }
             if ( go =="down" ) {
-                if (pwr > 0){
+                if (pwr > 1){
                     pwr--;
                 }
             }
