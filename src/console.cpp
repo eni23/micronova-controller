@@ -32,6 +32,18 @@ void release_stove_lock(){
 }
 
 
+
+// this is a task that runs around 600ms after creation of the terminal to 
+// set linemode correct when no terminal client is attached
+void console_fix_linenoise(void* pvParameters){
+    delay(600);
+    linenoiseSetDumbMode(0);
+    vTaskDelete(NULL);
+}
+
+
+
+
 void init_console(){
 
     console.begin(SERIAL_BAUD);
@@ -39,7 +51,9 @@ void init_console(){
     console.registerSystemCommands();
     console.registerGPIOCommands();
 
-    
+    // create fix task
+    xTaskCreate(console_fix_linenoise, "lfx", 5000, NULL, 1, NULL);
+
 
     /****
     Stove functions
@@ -294,12 +308,6 @@ void init_console(){
         wifi_reconnect();
         return EXIT_SUCCESS;
     }, "reconnect wifi"));
-
-    // TODO: move this to a rtos timer
-    console.registerCommand(ConsoleCommandD("t", [](int argc, char **argv) -> int {
-        linenoiseSetDumbMode(0);
-        return EXIT_SUCCESS;
-    }, "init terminal"));
 
 
 }
