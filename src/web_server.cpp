@@ -17,7 +17,7 @@ uint8_t hexstr2uint(String s){
 void web_init_server(){
 
     // TODO: make port configurable
-    web_server = new AsyncWebServer(WEB_SERVER_PORT);
+    web_server = new AsyncWebServer(settings.getUInt("web-port", WEB_SERVER_PORT));
 
 
     printf("init web server \n");

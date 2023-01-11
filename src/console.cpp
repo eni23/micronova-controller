@@ -237,6 +237,10 @@ void init_console(){
             }
 
             printf("configured TCP port: %i\n", settings.getUInt("tcp-port", TCP_SERVER_PORT));
+            #if WEB_SERVER_ENABLE == True
+                printf("configured web port: %i\n", settings.getUInt("web-port", WEB_SERVER_PORT));
+            #endif
+
             return EXIT_SUCCESS;
         }
         if (argc == 2){
@@ -280,7 +284,7 @@ void init_console(){
         settings.putUInt("tcp-port", port);
         printf("port configured to: %i. please run 'restart' to apply.\n", port);
         return EXIT_SUCCESS;
-    }, "delete all settings"));
+    }, "Configure TCP server port"));
 
 
 
@@ -308,6 +312,28 @@ void init_console(){
         wifi_reconnect();
         return EXIT_SUCCESS;
     }, "reconnect wifi"));
+
+
+    // web server stuff
+    #if WEB_SERVER_ENABLE == True
+
+    console.registerCommand(ConsoleCommandD("set-web-port", [](int argc, char **argv) -> int {
+        if (argc != 2){
+            printf("usage: set-web-port [PORTNUM]\n");
+            return EXIT_FAILURE;
+        }
+        uint16_t port = '\0';
+        sscanf(argv[1], "%u", &port);
+        if (port<1){
+            printf("err: port needs to be bigger than 0\n");
+            return EXIT_FAILURE;
+        }
+        settings.putUInt("web-port", port);
+        printf("web server port configured to: %i. please run 'restart' to apply.\n", port);
+        return EXIT_SUCCESS;
+    }, "Configure web server port"));
+
+    #endif
 
 
 }
