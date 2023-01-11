@@ -2,15 +2,13 @@
 MONITOR_BAUD		= 115200
 SERIAL_DEVICE		= /dev/ttyUSB*
 
-.PHONY: all inotify-watch-upload monitor-loop
+.PHONY: all upload clean program uploadfs find-serial find-monitor-baud
 
 all:
 	platformio -f -c vim run
 
-upload: monitor-close
+upload:
 	pio run --target upload
-
-upload-reopen-monitor: all upload monitor-notify-done
 
 clean:
 	platformio -f -c vim run --target clean 
@@ -34,14 +32,5 @@ find-serial:
 find-monitor-baud:
 	$(eval MONITOR_BAUD=$(shell tools/config-value.sh SERIAL_BAUD ))
 
-monitor: find-monitor-baud find-serial
-	tools/monitor.sh open $(USBTTY) $(MONITOR_BAUD)
-
-monitor-close:
-	tools/monitor.sh close
-
-monitor-loop: find-monitor-baud find-serial
-	-tools/monitor.sh loop $(USBTTY) $(MONITOR_BAUD)
-
-monitor-notify-done:
-	tools/monitor.sh notify-done
+monitor: find-monitor-baud
+	@pio device monitor --baud $(MONITOR_BAUD) --raw --quiet
