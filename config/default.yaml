@@ -26,3 +26,5 @@ web_server:
 # if the console is disabled, settings can only be made in this file
 console:
   enable: true
+  # null bytes need to be double escaped here
+  prompt: "\\033[38;5;2mmicronova-controller# \\033[0;10m"

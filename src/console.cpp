@@ -47,7 +47,7 @@ void console_fix_linenoise(void* pvParameters){
 void init_console(){
 
     console.begin(SERIAL_BAUD);
-    console.setPrompt("\033[38;5;1mmicronova-controller# \033[0;10m");
+    console.setPrompt(CONSOLE_PROMPT);
     console.registerSystemCommands();
     console.registerGPIOCommands();
 
