@@ -192,27 +192,29 @@ void web_init_server(){
     web_server->on("/api/power", HTTP_POST, [](AsyncWebServerRequest *request){        
         if (request->hasParam("go", true)) {
             String go = request->getParam("go", true)->value();
+            if (go != "up" && go != "down"){
+                request->send(500, "text/plain", "err_param");
+                return;
+            }
             // check for stove lock
             if( !xSemaphoreTake( xStoveSemaphore, ( TickType_t ) STOVE_SEMAPHORE_WAIT_TICKS ) == pdTRUE ){
                 request->send(500, "text/plain", "err_lock");
                 return;
             }
-            uint8_t cmd=0;
+            // get current power
+            stove.read_eeprom(STOVE_ADDR_POWER_EEPROM);
+            uint8_t pwr = stove.last_read_value;
             if (go == "up"){
-                cmd = STOVE_IR_POWERUP;
+                if (pwr<4){
+                    pwr++;
+                }
             }
             if ( go =="down" ) {
-                cmd = STOVE_IR_POWERDOWN;
-            } 
-            if (cmd == 0) {
-                xSemaphoreGive(xStoveSemaphore);
-                request->send(500, "text/plain", "err_param");
-                return;
+                if (pwr > 0){
+                    pwr--;
+                }
             }
-            for (uint8_t i=0; i<2; i++){
-                stove.write_ram(STOVE_ADDR_IRCOMMAND, cmd);
-                delay(80);
-            }
+            stove.write_eeprom(STOVE_ADDR_POWER_EEPROM, pwr);
             xSemaphoreGive(xStoveSemaphore);
             request->send(200, "text/plain", "OK");
             return;
