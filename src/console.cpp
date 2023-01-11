@@ -235,8 +235,9 @@ void init_console(){
                     settings.getString("if-dns", IFCONFIG_DNS)
                 );
             }
-
-            printf("configured TCP port: %i\n", settings.getUInt("tcp-port", TCP_SERVER_PORT));
+            #if TCP_SERVER_ENABLE == True
+                printf("configured TCP port: %i\n", settings.getUInt("tcp-port", TCP_SERVER_PORT));
+            #endif
             #if WEB_SERVER_ENABLE == True
                 printf("configured web port: %i\n", settings.getUInt("web-port", WEB_SERVER_PORT));
             #endif
@@ -270,6 +271,9 @@ void init_console(){
         return EXIT_SUCCESS;
     }, "delete all settings"));
 
+
+    #if TCP_SERVER_ENABLE == True
+
     console.registerCommand(ConsoleCommandD("set-tcp-port", [](int argc, char **argv) -> int {
         if (argc != 2){
             printf("usage: set-tcp-port [PORTNUM]\n");
@@ -285,6 +289,8 @@ void init_console(){
         printf("port configured to: %i. please run 'restart' to apply.\n", port);
         return EXIT_SUCCESS;
     }, "Configure TCP server port"));
+    
+    #endif
 
 
 

@@ -11,10 +11,18 @@ ifconfig:
   netmask: 255.255.0.0
   dns: 10.10.1.1
 
-tcp_server_port: 9040
+# enabling can only be configured during build time, port when its running
+tcp_server:
+  enable: true
+  port: 9040
 
 
-# enabling & configuring web server only supported during build time
+# enabling can only be configured during build time, port when its running
 web_server:
   enable: true
   port: 80
+
+# serial console can only be enabled/disabled during build time
+# if the console is disabled, settings can only be made in this file
+console:
+  enable: true

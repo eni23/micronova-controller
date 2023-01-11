@@ -41,11 +41,16 @@ void setup() {
     settings.begin(PREFERENCES_NAMESPACE, false); 
 
     // start serial console
-    init_console();
-        
-    // init tcp server
-    tcp_init_server();
+    #if CONSOLE_ENABLE == True
+        init_console();
+    #endif
 
+    // start tcp server if enabled
+    #if TCP_SERVER_ENABLE == True
+        tcp_init_server();
+    #endif
+
+    // start web server if enabled
     #if WEB_SERVER_ENABLE == True
         web_init_server();
     #endif
